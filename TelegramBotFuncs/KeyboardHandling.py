@@ -154,6 +154,7 @@ def debug_keyboard():
         types.KeyboardButton("Formulate JSON"),
         types.KeyboardButton("Refresh Cache"),
         types.KeyboardButton("Restart"),
+        types.KeyboardButton("Shutdown"),
         types.KeyboardButton("Cancel")
     )
 

@@ -64,7 +64,7 @@ def request_bus_stop_timing(bus_stop_code: int | str, api_key: str, svc_num: lis
     :param no_exact_time: Boolean parameter to disallow the showing of exact timing for arrivals
     :param short_forms: Show short forms of certain texts
     :param use_emojis: Boolean parameter to use emoji for certain texts
-    :return: A Tuple of 18 values (exc. !):
+    :return: A Tuple of 23 values (exc. !):
              [0] -> Service Number,
              [1] -> Service Operator,
              [2] -> First Bus Timing in XX min @ XX:XX:XX,
@@ -85,6 +85,9 @@ def request_bus_stop_timing(bus_stop_code: int | str, api_key: str, svc_num: lis
              [17] -> Boolean State to state whether all buses are on 1st Visit only,
              [18] -> Origin Bus Stop,
              [19] -> Destination Bus Stop,
+             [20] -> First Bus Timing Accuracy
+             [21] -> Second Bus Timing Accuracy
+             [22] -> Third Bus Timing Accuracy
              [!] -> Note: For 14 to 17, bool state is to be used to determine on which type of duration(s) to be shown.
     """
     # URL Construct
@@ -328,15 +331,15 @@ def request_bus_stop_timing(bus_stop_code: int | str, api_key: str, svc_num: lis
                     f"=======================================================================================\n"
                     f"1. {next_bus} @ {nb_time[0]}:{nb_time[1]}:{nb_time[2]} ({bus_svc['NextBus']['EstimatedArrival']})"
                     f" | {interpret_seating(bus_svc['NextBus']['Load'])} | {interpret_type(bus_svc['NextBus']['Type'])}"
-                    f" | Visit: {bus_svc['NextBus']['VisitNumber']}\n"
+                    f" | Visit: {bus_svc['NextBus']['VisitNumber']} | Accurate: {bool(bus_svc['NextBus']['Monitored'])}\n"
                     f"2. {next_bus2} @ {nb_time2[0]}:{nb_time2[1]}:{nb_time2[2]} "
                     f"({bus_svc['NextBus2']['EstimatedArrival']}) | {interpret_seating(bus_svc['NextBus2']['Load'])} | "
                     f"{interpret_type(bus_svc['NextBus2']['Type'])}"
-                    f" | Visit: {bus_svc['NextBus2']['VisitNumber']}\n"
+                    f" | Visit: {bus_svc['NextBus2']['VisitNumber']} | Accurate: {bool(bus_svc['NextBus']['Monitored'])}\n"
                     f"3. {next_bus3} @ {nb_time3[0]}:{nb_time3[1]}:{nb_time3[2]} "
                     f"({bus_svc['NextBus3']['EstimatedArrival']}) | {interpret_seating(bus_svc['NextBus3']['Load'])} | "
                     f"{interpret_type(bus_svc['NextBus3']['Type'])}"
-                    f" | Visit: {bus_svc['NextBus3']['VisitNumber']}\n"
+                    f" | Visit: {bus_svc['NextBus3']['VisitNumber']} | Accurate: {bool(bus_svc['NextBus']['Monitored'])}\n"
                 )
 
                 print(
@@ -373,7 +376,10 @@ def request_bus_stop_timing(bus_stop_code: int | str, api_key: str, svc_num: lis
                     est_dur_2,  # [16]
                     one_visit,  # [17]
                     bus_svc['NextBus']['OriginCode'],  # [18]
-                    bus_svc['NextBus']['DestinationCode']  # [19]
+                    bus_svc['NextBus']['DestinationCode'],  # [19]
+                    bool(bus_svc['NextBus']['Monitored']),  # [20]
+                    bool(bus_svc['NextBus2']['Monitored']),  # [21]
+                    bool(bus_svc['NextBus3']['Monitored'])  # [22]
                 )
             )
 

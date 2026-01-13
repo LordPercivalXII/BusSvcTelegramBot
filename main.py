@@ -1,4 +1,7 @@
 import os
+import subprocess
+import sys
+
 import telebot
 from dotenv import load_dotenv
 from pathlib import Path
@@ -60,6 +63,24 @@ json_mem = JSONHandler("MemoryData")
 gen_state = json_mem.generate_json(dict())
 json_mem.formulate_json()
 
+# ======================================================================================================================
+# Base Functions
+
+def init_user_mem_data(username: str):
+    if json_mem.json_data.get(f"{username}") is None:
+        json_mem.add_json_entry(
+            f"{username}",
+            {
+                "bus_mem": "",
+                "favourites": [],
+                "svc_mem": []
+            }
+        )
+
+def check_user_mem_data_exists(username: str):
+    if json_mem.json_data.get(f"{username}") is None:
+        init_user_mem_data(username)
+
 
 # ======================================================================================================================
 # Commands
@@ -70,6 +91,9 @@ def bot_svc_start(message: types.Message):
     :param message:
     :return:
     """
+
+    init_user_mem_data(get_user_name(message))
+
     msg = "Welcome to the Bus Timings Telegram Bot.\n" \
           "To start, please type /query_timing or /search.\n\n" \
           "Program created by TwelfthDoctor1."
@@ -221,6 +245,7 @@ def svc_filtering(message: types.Message, bus_stop_code: str = "", svc_filter: l
     """
     # Request Service List
     svc_list = api_handler.request_bus_stop_svc_list(bus_stop_code)
+    check_user_mem_data_exists(get_user_name(message))
 
     print(f"{svc_list} | {svc_filter}")
 
@@ -326,12 +351,12 @@ def parse_data(message: types.Message, bus_stop_info: str, bus_svc_list_str: str
             bus_stop_info_data[i] = bus_stop_info_data[i].strip()
 
         # Get Bus Stop Code or list of codes from Name and/or Road
-        if len(bus_stop_info_data) == 1:
-            # If Name is given only, to get bus stop code or list of codes (if more than 1)
-            bus_stop_code = request_bus_stop_code_from_name(bus_stop_info_data[0])
-        else:
-            # If Name and Road is given, to get bus stop code or list of codes (If more than 1, but unlikely)
-            bus_stop_code = request_bus_stop_code_from_name(bus_stop_info_data[0], bus_stop_info_data[1])
+        # If Name is given only, to get bus stop code or list of codes (if more than 1)
+        # If Name and Road is given, to get bus stop code or list of codes (If more than 1, but unlikely)
+        bus_stop_code = request_bus_stop_code_from_name(
+            bus_stop_info_data[0],
+            "" if len(bus_stop_info_data) == 1 else bus_stop_info_data[1]
+        )
 
     # Get Filter
     if bus_svc_list_str == "":
@@ -380,6 +405,14 @@ def parse_data(message: types.Message, bus_stop_info: str, bus_svc_list_str: str
             f"{returner[i][0]}\n{returner[i][1]}\n\n{returner[i][2]}\n{returner[i][3]}\n{returner[i][4]}\n"
             f"\n{returner[i][5]}"
         )
+
+    # Send Message on Time Estimation & Bus Gaps
+    bot.send_message(
+        message.chat.id,
+        "[EST] - Timing based on Schedule Timings, Bus not yet deployed or providing geolocation\n\n"
+        "Noticed a big gap between different bus timings? It might be due to a bus that may not be tracked by the system or it could be a traffic related issue.\n"
+        "If it is not a traffic related issue, consider using previously known duration times to plan your journey."
+    )
 
     if hide_cmd_list is False:
         bot.send_message(
@@ -878,6 +911,14 @@ def debug_mode_proc(message: types.Message):
         refresh_cache(message)
         bot.send_message(message.chat.id, "Refreshed Transport Data Caches.", reply_markup=start_menu_keyboard(message))
         return
+
+    elif message.text == "Shutdown":
+        bot.send_message(message.chat.id, "Shutting down...", reply_markup=start_menu_keyboard(message))
+        sys.exit("SHUTDOWN - INITIATED BY COMMAND")
+
+    # elif message.text == "Restart":
+    #     bot.send_message(message.chat.id, "Restarting...", reply_markup=start_menu_keyboard(message))
+    #     subprocess.call([sys.executable, os.path.realpath(__file__)] + sys.argv[1:])
 
 
 @bot.message_handler(func=lambda message: True)

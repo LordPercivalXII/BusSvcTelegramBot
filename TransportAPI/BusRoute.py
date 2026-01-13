@@ -3,7 +3,6 @@ import os
 import urllib.request
 from dotenv import load_dotenv
 from pathlib import Path
-
 from TransportAPI.BusService import sort_bus_svc_list
 from UtilLib.JSONHandler import JSONHandler
 
