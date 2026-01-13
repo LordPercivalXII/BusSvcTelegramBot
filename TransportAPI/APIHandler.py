@@ -99,9 +99,9 @@ class TransportAPIHandler:
                 f"Service [{arrival_data[0]}] | {arrival_data[1]}\n"
                 f"{svc_info}\n"
                 f"=======================================================================================\n"
-                f"{f'{arrival_data[2]} | {arrival_data[5]} | {arrival_data[8]} | Visit: {arrival_data[11]} | Accurate: {arrival_data[20]}' if arrival_data[2] != "Not in Service" else arrival_data[2]}\n"
-                f"{f'{arrival_data[3]} | {arrival_data[6]} | {arrival_data[9]} | Visit: {arrival_data[12]} | Accurate: {arrival_data[21]}' if arrival_data[3] != "Not in Service" else arrival_data[3]}\n"
-                f"{f'{arrival_data[4]} | {arrival_data[7]} | {arrival_data[10]} | Visit: {arrival_data[13]} | Accurate: {arrival_data[22]}' if arrival_data[4] != "Not in Service" else arrival_data[4]}\n"
+                f'{arrival_data[2]} | {arrival_data[5]} | {arrival_data[8]} | Visit: {arrival_data[11]} | Accurate: {arrival_data[20]}\n'
+                f'{arrival_data[3]} | {arrival_data[6]} | {arrival_data[9]} | Visit: {arrival_data[12]} | Accurate: {arrival_data[21]}\n'
+                f'{arrival_data[4]} | {arrival_data[7]} | {arrival_data[10]} | Visit: {arrival_data[13]} | Accurate: {arrival_data[22]}\n'
             )
 
             print(
