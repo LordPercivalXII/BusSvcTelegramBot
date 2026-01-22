@@ -1,6 +1,6 @@
+import json
 import os
 from pathlib import Path
-from UtilLib.JSONParser import json_load, json_dump
 from UtilLib.Logging import LoggerClass
 
 # Filepath to hold the JSON File
@@ -31,7 +31,7 @@ class JSONHandler:
         :return:
         """
         with open(self.json_fp, "r") as json_ref:
-            self.json_data = json_load(json_ref.read())
+            self.json_data = self.json_load(json_ref.read())
             json_ref.close()
 
         self.logger.info(
@@ -54,7 +54,7 @@ class JSONHandler:
             self.logger.info(f"JSON File ({self.json}) does not exist. Creating...", to_console=False)
 
             with open(self.json_fp, "w") as json_file:
-                json_file.write(json_dump(data_dict))
+                json_file.write(self.json_dump(data_dict))
                 json_file.close()
 
             return True
@@ -69,7 +69,7 @@ class JSONHandler:
         """
         with open(self.json_fp, "w") as json_file:
             # print(json_dump(self.json_data))
-            json_file.write(json_dump(self.json_data))
+            json_file.write(self.json_dump(self.json_data))
             json_file.close()
 
         self.logger.info(
@@ -131,3 +131,21 @@ class JSONHandler:
         :return:
         """
         del self.json_data[key]
+
+    @staticmethod
+    def json_dump(json_dict: dict):
+        """
+        Function to convert Python Dictionary into JSON.
+        :param json_dict: Dictionary to be converted into JSON format.
+        :return:
+        """
+        return json.dumps(json_dict, sort_keys=True, indent=4)
+
+    @staticmethod
+    def json_load(json_data: str | bytes):
+        """
+        Function to convert JSON into Python Dictionary.
+        :param json_data: JSON data to be converted into Dictionary format.
+        :return:
+        """
+        return json.loads(json_data)

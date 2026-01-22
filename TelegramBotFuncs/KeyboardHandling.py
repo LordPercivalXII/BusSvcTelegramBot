@@ -8,7 +8,7 @@ def start_menu_keyboard(message):
 
     kb.add(
         types.KeyboardButton("Query Timing"),
-        # types.KeyboardButton("Search"),
+        # types.KeyboardButton("Search"),  # Removed, Query Timing encompass Search Function
         types.KeyboardButton("Refresh"),
         types.KeyboardButton("Filter"),
         types.KeyboardButton("Cancel"),

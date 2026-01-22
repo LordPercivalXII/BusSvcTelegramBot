@@ -2,6 +2,7 @@ import json
 import os
 import ssl
 import urllib.request
+from urllib.error import URLError
 from dotenv import load_dotenv
 from math import sqrt
 from pathlib import Path
@@ -35,34 +36,50 @@ def request_bus_stop_name_lta(bus_stop_code: int | str, api_key: str, debug: boo
 
         request = urllib.request.Request(url=url, method="GET", headers=headers)
 
-        with urllib.request.urlopen(request) as response:
-            json_dict = response.read().decode("utf-8")
-            dict_data = json.loads(json_dict)
+        try:
+            with urllib.request.urlopen(request) as response:
+                json_dict = response.read().decode("utf-8")
+                dict_data = json.loads(json_dict)
 
-            for data in dict_data["value"]:
-                if data["BusStopCode"] == str(bus_stop_code):
-                    if debug:
-                        print(
-                            f"=======================================================================================\n"
-                            f"{data['Description']} @ {data['RoadName']} [{bus_stop_code}]\n"
-                            f"======================================================================================="
+                for data in dict_data["value"]:
+                    if data["BusStopCode"] == str(bus_stop_code):
+                        if debug:
+                            print(
+                                f"=======================================================================================\n"
+                                f"{data['Description']} @ {data['RoadName']} [{bus_stop_code}]\n"
+                                f"======================================================================================="
+                            )
+
+                        return (
+                            data["Description"],
+                            data["RoadName"],
+                            True
                         )
 
+                if len(dict_data["value"]) < 500:
                     return (
-                        data["Description"],
-                        data["RoadName"],
-                        True
+                        None,
+                        None,
+                        False
                     )
 
-            if len(dict_data["value"]) < 500:
-                return (
-                    None,
-                    None,
-                    False
-                )
+                else:
+                    skip_val += 500
+            return None
+        except URLError as e:
+            if hasattr(e, "code") and hasattr(e, "reason"):
+                # HTTP Error Code + Reason
+                print(f"[{e.code} | {e.reason}] Error connecting to LTA DataMall API Service")
+
+            elif hasattr(e, "reason"):
+                # HTTP Error Reason
+                print(f"[{e.reason}] Error connecting to LTA DataMall API Service")
 
             else:
-                skip_val += 500
+                # Exception Error Dump
+                print(f"[{e}] Error connecting to LTA DataMall API Service")
+
+            return None
 
 
 def request_bus_stop_name_tih(bus_stop_code: int | str, api_key: str):
@@ -115,21 +132,37 @@ def store_bus_stop_data(api_key: str):
 
         request = urllib.request.Request(url=url, method="GET", headers=headers)
 
-        with urllib.request.urlopen(request) as response:
-            json_dict = response.read().decode("utf-8")
-            dict_data = json.loads(json_dict)
+        try:
+            with urllib.request.urlopen(request) as response:
+                json_dict = response.read().decode("utf-8")
+                dict_data = json.loads(json_dict)
 
-            curr_data["value"].extend(dict_data["value"])
+                curr_data["value"].extend(dict_data["value"])
 
-            if len(dict_data["value"]) < 500:
-                break
+                if len(dict_data["value"]) < 500:
+                    break
+
+                else:
+                    skip_val += 500
+        except URLError as e:
+            if hasattr(e, "code") and hasattr(e, "reason"):
+                # HTTP Error Code + Reason
+                print(f"[{e.code} | {e.reason}] Error connecting to LTA DataMall API Service")
+
+            elif hasattr(e, "reason"):
+                # HTTP Error Reason
+                print(f"[{e.reason}] Error connecting to LTA DataMall API Service")
 
             else:
-                skip_val += 500
+                # Exception Error Dump
+                print(f"[{e}] Error connecting to LTA DataMall API Service")
+
+            return
 
     bus_stop_data.update_json(curr_data)
     bus_stop_data.update_json_file()
     bus_stop_data.formulate_json()
+    return
 
 
 def return_bus_stop_name_json(bus_stop_code: str):

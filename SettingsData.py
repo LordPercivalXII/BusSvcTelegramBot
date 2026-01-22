@@ -11,5 +11,9 @@ SETTINGS_DATA = {
     "use_emojis": {
         "name": "Use Emojis",
         "data": True
+    },
+    "est_msg" : {
+        "name": "Show Estimated Timings Message",
+        "data": True
     }
 }

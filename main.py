@@ -1,7 +1,5 @@
 import os
-import subprocess
 import sys
-
 import telebot
 from dotenv import load_dotenv
 from pathlib import Path
@@ -76,6 +74,7 @@ def init_user_mem_data(username: str):
                 "svc_mem": []
             }
         )
+        json_mem.update_json_file()
 
 def check_user_mem_data_exists(username: str):
     if json_mem.json_data.get(f"{username}") is None:
@@ -109,6 +108,7 @@ def query_timing(message: types.Message):
     :param message:
     :return:
     """
+    check_user_mem_data_exists(get_user_name(message))
     sent_msg = bot.send_message(
         message.chat.id,
         "Enter either the following to query bus timings:"
@@ -384,6 +384,10 @@ def parse_data(message: types.Message, bus_stop_info: str, bus_svc_list_str: str
     # Get Arrival Time
     mem_dict["bus_mem"] = bus_stop_code
     returner = api_handler.request_arrival_time(bus_stop_code, bus_svc_list, f"{get_user_name(message)}")
+
+    # if len(returner) == 1:
+    #     bot.send_message(message.chat.id, returner[0])
+    #     return
 
     # Message Header
     bot.send_message(message.chat.id, returner[0], reply_markup=start_menu_keyboard(message))
