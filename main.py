@@ -9,8 +9,6 @@ from TelegramBotFuncs.KeyboardHandling import start_menu_keyboard,location_keybo
     get_option_number, filtering_keyboard, debug_keyboard
 from TelegramBotFuncs.NameGetting import get_user_name
 from TransportAPI.APIHandler import TransportAPIHandler
-from TransportAPI.BusStopInfo import request_bus_stop_code_from_name, get_nearby_bus_stops, \
-    return_bus_stop_name_json
 from UtilLib.JSONHandler import JSONHandler
 from UtilLib.Logging import LoggerClass
 
@@ -176,10 +174,10 @@ def bus_stop_selection(message: types.Message, bus_stop_code: str | list = ""):
         # Get Bus Stop Code or list of codes from Name and/or Road
         if len(bus_stop_info_data) == 1:
             # If Name is given only, to get bus stop code or list of codes (if more than 1)
-            bus_stop_code = request_bus_stop_code_from_name(bus_stop_info_data[0])
+            bus_stop_code = api_handler.request_bus_stop_code_from_name(bus_stop_info_data[0])
         else:
             # If Name and Road is given, to get bus stop code or list of codes (If more than 1, but unlikely)
-            bus_stop_code = request_bus_stop_code_from_name(bus_stop_info_data[0], bus_stop_info_data[1])
+            bus_stop_code = api_handler.request_bus_stop_code_from_name(bus_stop_info_data[0], bus_stop_info_data[1])
 
     # Proceed to Filtering if Var is a string (no list)
     if isinstance(bus_stop_code, str):
@@ -353,7 +351,7 @@ def parse_data(message: types.Message, bus_stop_info: str, bus_svc_list_str: str
         # Get Bus Stop Code or list of codes from Name and/or Road
         # If Name is given only, to get bus stop code or list of codes (if more than 1)
         # If Name and Road is given, to get bus stop code or list of codes (If more than 1, but unlikely)
-        bus_stop_code = request_bus_stop_code_from_name(
+        bus_stop_code = api_handler.request_bus_stop_code_from_name(
             bus_stop_info_data[0],
             "" if len(bus_stop_info_data) == 1 else bus_stop_info_data[1]
         )
@@ -516,7 +514,7 @@ def search_query_proc(message: types.Message):
     lat = message.location.latitude
 
     # Get list of nearby stops from coordinates
-    nearby_stops = get_nearby_bus_stops(lon, lat)
+    nearby_stops = api_handler.get_nearby_bus_stops(lon, lat)
 
     msg = "Nearby Bus Stops\n"
 
@@ -631,10 +629,10 @@ def list_favourites(message: types.Message):
 
     # Generate options
     for i in range(len(mem_dict["favourites"])):
-        msg += f"\n{i + 1}. {return_bus_stop_name_json(mem_dict['favourites'][i][0])[0]} | " \
+        msg += f"\n{i + 1}. {api_handler.return_bus_stop_name_json(mem_dict['favourites'][i][0])[0]} | " \
                f"{str(', ').join(mem_dict['favourites'][i][1])}"
         msg_data.append(
-            f"{return_bus_stop_name_json(mem_dict['favourites'][i][0])[0]} | "
+            f"{api_handler.return_bus_stop_name_json(mem_dict['favourites'][i][0])[0]} | "
             f"{str(', ').join(mem_dict['favourites'][i][1])}"
         )
 
@@ -702,10 +700,10 @@ def delete_favourites_list(message: types.Message):
 
     # Generate option list
     for i in range(len(mem_dict["favourites"])):
-        msg += f"\n{i + 1}. {return_bus_stop_name_json(mem_dict['favourites'][i][0])[0]} | " \
+        msg += f"\n{i + 1}. {api_handler.return_bus_stop_name_json(mem_dict['favourites'][i][0])[0]} | " \
                f"{str(', ').join(mem_dict['favourites'][i][1])}"
         msg_data.append(
-            f"{return_bus_stop_name_json(mem_dict['favourites'][i][0])[0]} | "
+            f"{api_handler.return_bus_stop_name_json(mem_dict['favourites'][i][0])[0]} | "
             f"{str(', ').join(mem_dict['favourites'][i][1])}"
         )
 
