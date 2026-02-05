@@ -3,7 +3,7 @@ from telebot import types
 from TelegramBotFuncs.NameGetting import get_user_name
 
 
-def start_menu_keyboard(message):
+def start_menu_keyboard(message, proj_owner):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
 
     kb.add(
@@ -19,7 +19,7 @@ def start_menu_keyboard(message):
         types.KeyboardButton("Settings")
     )
 
-    if get_user_name(message) == "TwelfthDoctor1":
+    if get_user_name(message) == proj_owner:
         kb.add(types.KeyboardButton("Debug Mode"))
 
     return kb

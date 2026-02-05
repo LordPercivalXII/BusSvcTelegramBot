@@ -24,6 +24,7 @@ load_dotenv(dotenv_path=ENV_PATH)
 # Get Values from ENV
 API_KEY_TG = os.getenv("BOT_KEY")
 API_KEY_LTA = os.getenv("API_KEY_LTA")
+PROJ_OWNER = os.getenv("PROJ_OWNER")
 ENV_LIST = [API_KEY_LTA]
 
 # API Handling & Data Caching
@@ -94,7 +95,7 @@ def bot_svc_start(message: types.Message):
     msg = "Welcome to the Bus Timings Telegram Bot.\n" \
           "To start, please type /query_timing or /search.\n\n" \
           "Program created by TwelfthDoctor1."
-    bot.send_message(message.chat.id, msg, reply_markup=start_menu_keyboard(message))
+    bot.send_message(message.chat.id, msg, reply_markup=start_menu_keyboard(message, PROJ_OWNER))
 
 
 @bot.message_handler(commands=["query_timing"])
@@ -135,7 +136,7 @@ def filter_preface(message: types.Message):
             message.chat.id,
             "You cannot filter for explicit buses if you have not queried for a bus timing. Please use /query_timing "
             "or /search instead.",
-            reply_markup=start_menu_keyboard(message)
+            reply_markup=start_menu_keyboard(message, PROJ_OWNER)
         )
         return None
 
@@ -154,7 +155,7 @@ def bus_stop_selection(message: types.Message, bus_stop_code: str | list = ""):
 
     # User cancel
     if message.text == "/cancel" or message.text == "Cancel":
-        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         return
 
     # Assume bus stop code as message text if empty
@@ -211,7 +212,7 @@ def pre_filter_get_bus_stop(message: types.Message, bus_stop_code, msg_data):
     """
     # User Cancel
     if message.text == "/cancel" or message.text == "Cancel":
-        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         return None
 
     # Option - Button
@@ -263,7 +264,7 @@ def svc_filtering(message: types.Message, bus_stop_code: str = "", svc_filter: l
 
 def post_svc_filtering(message: types.Message, bus_stop_code, svc_filter: list | None = None):
     if message.text == "/cancel" or message.text == "Cancel":
-        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         # svc_filter = []
         return None
 
@@ -332,7 +333,7 @@ def parse_data(message: types.Message, bus_stop_info: str, bus_svc_list_str: str
 
     # User Cancel
     if message.text == "/cancel" or message.text == "Cancel":
-        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         return
 
     # If Var is an integer -> Bus Stop Code
@@ -388,7 +389,7 @@ def parse_data(message: types.Message, bus_stop_info: str, bus_svc_list_str: str
     #     return
 
     # Message Header
-    bot.send_message(message.chat.id, returner[0], reply_markup=start_menu_keyboard(message))
+    bot.send_message(message.chat.id, returner[0], reply_markup=start_menu_keyboard(message, PROJ_OWNER))
 
     # Check condition if return only has 1 item (at least 2)
     if len(returner) == 1:
@@ -445,7 +446,7 @@ def refresh_timings(message: types.Message):
     if mem_dict["bus_mem"] == "":
         bot.send_message(
             message.chat.id, "You have not queried for a bus timing. Please use /query_timing or /search instead.",
-            reply_markup=start_menu_keyboard(message)
+            reply_markup=start_menu_keyboard(message, PROJ_OWNER)
         )
         return
 
@@ -474,7 +475,7 @@ def clear_mem(message: types.Message):
     bot.send_message(
         message.chat.id,
         "Memory cleared. Please use /query_timing or /search to start again.",
-        reply_markup=start_menu_keyboard(message)
+        reply_markup=start_menu_keyboard(message, PROJ_OWNER)
     )
 
 
@@ -503,7 +504,7 @@ def search_query_proc(message: types.Message):
     msg_data = []
     # User cancel
     if message.text == "/cancel" or message.text == "Cancel":
-        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         return None
 
     if message.location is None:
@@ -548,7 +549,7 @@ def post_search_query(message: types.Message, nearby_stops: list, msg_data):
     """
     # User Cancel
     if message.text == "/cancel" or message.text == "Cancel":
-        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         return None
 
     # Option - Button
@@ -584,7 +585,7 @@ def add_to_favourites(message: types.Message):
     if mem_dict["bus_mem"] == "":
         bot.send_message(
             message.chat.id, "You have not queried for a bus timing. Please use /query_timing or /search instead.",
-            reply_markup=start_menu_keyboard(message)
+            reply_markup=start_menu_keyboard(message, PROJ_OWNER)
         )
         return
 
@@ -603,7 +604,7 @@ def add_to_favourites(message: types.Message):
     bot.send_message(
         message.chat.id,
         "The current bus timing query has been added to favourites.",
-        reply_markup=start_menu_keyboard(message)
+        reply_markup=start_menu_keyboard(message, PROJ_OWNER)
     )
 
 
@@ -621,7 +622,7 @@ def list_favourites(message: types.Message):
     if mem_dict.get("favourites") is None or mem_dict.get("favourites") == []:
         bot.send_message(
             message.chat.id, "No favourite bus timing queries.",
-            reply_markup=start_menu_keyboard(message)
+            reply_markup=start_menu_keyboard(message, PROJ_OWNER)
         )
         return
 
@@ -657,7 +658,7 @@ def fav_post_proc(message: types.Message, fav_list, msg_data):
     """
     # User Cancel
     if message.text == "/cancel" or message.text == "Cancel":
-        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         return None
 
     # Option - Button
@@ -692,7 +693,7 @@ def delete_favourites_list(message: types.Message):
     # Disallow empty/non existent favourites list
     if mem_dict.get("favourites") is None or len(mem_dict["favourites"]) == 0:
         bot.send_message(
-            message.chat.id, "No favourite bus timing queries.", start_menu_keyboard(message)
+            message.chat.id, "No favourite bus timing queries.", start_menu_keyboard(message, PROJ_OWNER)
         )
         return
 
@@ -725,7 +726,7 @@ def del_fav_proc(message: types.Message, fav_list, msg_data):
     pos = -1
     # User Cancel
     if message.text == "/cancel" or message.text == "Cancel":
-        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         return None
 
     # Option - Button
@@ -760,7 +761,7 @@ def del_fav_proc(message: types.Message, fav_list, msg_data):
     return bot.send_message(
         message.chat.id,
         "The selected bus timing has been deleted from favourites.",
-        reply_markup=start_menu_keyboard(message)
+        reply_markup=start_menu_keyboard(message, PROJ_OWNER)
     )
 
 
@@ -771,7 +772,7 @@ def refresh_cache(message: types.Message):
     :param message:
     :return:
     """
-    if get_user_name(message) != "TwelfthDoctor1":
+    if get_user_name(message) != PROJ_OWNER:
         bot.send_message(message.chat.id, "Ineligible perms.")
         return
 
@@ -831,7 +832,7 @@ def proc_handle_setting(message: types.Message, msg_data):
     key = ""
     # User Cancel
     if message.text == "/cancel" or message.text == "Cancel":
-        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         return None
 
     # Option - Button
@@ -861,7 +862,7 @@ def proc_handle_setting(message: types.Message, msg_data):
         bot.send_message(
             message.chat.id,
             "Unknown key, please enter a correct key.",
-            reply_markup=start_menu_keyboard(message)
+            reply_markup=start_menu_keyboard(message, PROJ_OWNER)
         )
 
     # Update Setting Value
@@ -874,13 +875,13 @@ def proc_handle_setting(message: types.Message, msg_data):
     return bot.send_message(
         message.chat.id,
         f"The setting [{mem_dict['settings'][key]['name']}] has been changed.",
-        reply_markup=start_menu_keyboard(message)
+        reply_markup=start_menu_keyboard(message, PROJ_OWNER)
     )
 
 
 @bot.message_handler(commands=["debug"])
 def debug_mode_main(message: types.Message):
-    if get_user_name(message) != "TwelfthDoctor1":
+    if get_user_name(message) != PROJ_OWNER:
         return
 
     msg = "Debug Mode\n"
@@ -901,25 +902,25 @@ def debug_mode_main(message: types.Message):
 def debug_mode_proc(message: types.Message):
     # User Cancel
     if message.text == "/cancel" or message.text == "Cancel":
-        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Action cancelled.", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         return
 
     elif message.text == "Formulate JSON":
         json_mem.formulate_json()
-        bot.send_message(message.chat.id, "Formulated JSON.", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Formulated JSON.", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         return
 
     elif message.text == "Refresh Cache":
         refresh_cache(message)
-        bot.send_message(message.chat.id, "Refreshed Transport Data Caches.", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Refreshed Transport Data Caches.", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         return
 
     elif message.text == "Shutdown":
-        bot.send_message(message.chat.id, "Shutting down...", reply_markup=start_menu_keyboard(message))
+        bot.send_message(message.chat.id, "Shutting down...", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
         sys.exit("SHUTDOWN - INITIATED BY COMMAND")
 
     # elif message.text == "Restart":
-    #     bot.send_message(message.chat.id, "Restarting...", reply_markup=start_menu_keyboard(message))
+    #     bot.send_message(message.chat.id, "Restarting...", reply_markup=start_menu_keyboard(message, PROJ_OWNER))
     #     subprocess.call([sys.executable, os.path.realpath(__file__)] + sys.argv[1:])
 
 
