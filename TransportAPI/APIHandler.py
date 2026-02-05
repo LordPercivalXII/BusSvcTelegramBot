@@ -1129,13 +1129,13 @@ class TransportAPIHandler:
                 return None
 
             for data in dict_data["value"]:
-                print(f"PROC: {data['ServiceNo']} | {data['Direction']} | {data['StopSequence']} | {data['BusStopCode']}")
-                print(f"PROC: {type(data['ServiceNo'])} | {type(data['Direction'])} | {type(data['StopSequence'])} | {type(data['BusStopCode'])}")
-                print(f"PROC: {data['ServiceNo']} not in bus_route_data.json_data: {data["ServiceNo"] not in self.bus_route_data.json_data}")
+                # print(f"PROC: {data['ServiceNo']} | {data['Direction']} | {data['StopSequence']} | {data['BusStopCode']}")
+                # print(f"PROC: {type(data['ServiceNo'])} | {type(data['Direction'])} | {type(data['StopSequence'])} | {type(data['BusStopCode'])}")
+                # print(f"PROC: {data['ServiceNo']} not in bus_route_data.json_data: {data["ServiceNo"] not in self.bus_route_data.json_data}")
 
                 # Create Entry if not Exist
                 if data["ServiceNo"] not in self.bus_route_data.json_data:
-                    print(f"PROC: CREATE FOR {data['ServiceNo']}")
+                    # print(f"PROC: CREATE FOR {data['ServiceNo']}")
                     self.bus_route_data.update_specific_json(
                         data["ServiceNo"],
                         {
@@ -1148,10 +1148,10 @@ class TransportAPIHandler:
                 # Amend existing values
                 else:
                     route_dict = self.bus_route_data.return_specific_json(data["ServiceNo"])
-                    print(f"PROC: {data['ServiceNo']} | {data['Direction']}")
+                    # print(f"PROC: {data['ServiceNo']} | {data['Direction']}")
                     # print(f"{route_dict}")
 
-                    print(f"PROC: {data['Direction']} in route_dict: {data["Direction"] in route_dict}")
+                    # print(f"PROC: {data['Direction']} in route_dict: {data["Direction"] in route_dict}")
 
                     if data["Direction"] in route_dict:
                         route_dict[str(data["Direction"])][str(data["StopSequence"])] = (data["BusStopCode"], data["Distance"])
