@@ -166,7 +166,7 @@ if __name__ == "__main__":
 
     print(returner)
 
-    print(get_bus_svc_from_bus_stop_code("77009"))
+    print(get_bus_svc_from_bus_stop_code("77191"))
     # if returner[7] is False:
     #     print(
     #         f"=======================================================================================\n"

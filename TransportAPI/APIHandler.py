@@ -1131,7 +1131,7 @@ class TransportAPIHandler:
             for data in dict_data["value"]:
                 # print(f"PROC: {data['ServiceNo']} | {data['Direction']} | {data['StopSequence']} | {data['BusStopCode']}")
                 # print(f"PROC: {type(data['ServiceNo'])} | {type(data['Direction'])} | {type(data['StopSequence'])} | {type(data['BusStopCode'])}")
-                # print(f"PROC: {data['ServiceNo']} not in bus_route_data.json_data: {data["ServiceNo"] not in self.bus_route_data.json_data}")
+                # print(f"PROC: {data['ServiceNo']} in bus_route_data.json_data: {data["ServiceNo"] in self.bus_route_data.json_data}")
 
                 # Create Entry if not Exist
                 if data["ServiceNo"] not in self.bus_route_data.json_data:
@@ -1152,12 +1152,15 @@ class TransportAPIHandler:
                     # print(f"{route_dict}")
 
                     # print(f"PROC: {data['Direction']} in route_dict: {data["Direction"] in route_dict}")
+                    # print(f"PROC: Type: {type(data["Direction"])} | Keys: {data.keys()}")
 
-                    if data["Direction"] in route_dict:
+                    if str(data["Direction"]) in route_dict:
                         route_dict[str(data["Direction"])][str(data["StopSequence"])] = (data["BusStopCode"], data["Distance"])
 
                     else:
                         route_dict[str(data["Direction"])] = {str(data["StopSequence"]): (data["BusStopCode"], data["Distance"])}
+
+                    # print(route_dict)
 
                     self.bus_route_data.update_specific_json(data["ServiceNo"], route_dict)
 
@@ -1174,10 +1177,39 @@ class TransportAPIHandler:
     def get_bus_svc_from_bus_stop_code(self, bus_stop_code: str):
         svc_list = []
         for svc, data in self.bus_route_data.return_json().items():
+            # print(f"{svc} | {data}")
             for direction, dir_data in data.items():
+                # print(f"{direction} | {dir_data}")
                 for stop, stop_data in dir_data.items():
+                # print(f"{stop} | {stop_data}")
+                #     print(f"{bus_stop_code} | {svc} | {bus_stop_code in stop_data and svc not in svc_list}")
+                #     print(f"Bus Stop Code in Stop Data & Service not in Service List: {bus_stop_code in stop_data} & {svc not in svc_list}")
                     if bus_stop_code in stop_data and svc not in svc_list:
                         svc_list.append(svc)
                         break
 
         return self.sort_bus_svc_list(svc_list)
+
+
+if __name__ == "__main__":
+    import os
+    from dotenv import load_dotenv
+    from pathlib import Path
+
+    ENV_PATH = os.path.join(Path(__file__).resolve().parent.parent, "RefKey.env")
+
+    # Load ENV
+    load_dotenv(dotenv_path=ENV_PATH)
+
+    # Get Values from ENV
+    API_KEY_TG = os.getenv("BOT_KEY")
+    API_KEY_LTA = os.getenv("API_KEY_LTA")
+    PROJ_OWNER = os.getenv("PROJ_OWNER")
+    ENV_LIST = [API_KEY_LTA]
+    api_handler = TransportAPIHandler(API_KEY_LTA)
+
+    api_handler.store_json_data()
+
+    print(api_handler.get_bus_svc_from_bus_stop_code("77191"))
+
+    print(api_handler.request_bus_stop_svc_list("77191"))
